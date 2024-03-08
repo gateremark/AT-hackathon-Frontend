@@ -1,113 +1,121 @@
-import Image from "next/image";
+"use client";
+
+import { useDropzone } from "react-dropzone";
+import { useState } from "react";
+import { Toaster, toast } from "sonner";
+import { FaFileArrowDown } from "react-icons/fa6";
+import supabase from "@/lib/SupabaseClient";
+import { UploadData } from "@/app/api/supabase/route";
+import axios from "axios";
 
 export default function Home() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+    const [uploading, setUploading] = useState(false);
+    // const [fileUrl, setFileUrl] = useState<string | null>(null);
 
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-full sm:before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full sm:after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+    const uploadFile = async (file: File) => {
+      const time: Number = new Date().valueOf();
+      const imgKey: string = `insights/${file.name}-${time}`;
+        const { data, error } = await supabase.storage
+            .from("picsa")
+            .upload(imgKey, file, {
+                cacheControl: "3600",
+                upsert: false,
+            });
+        console.log("Data: ", data);
+        console.log("Error: ", error);
 
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
+        const fileUrl = supabase.storage
+            .from("picsa")
+            .getPublicUrl(`insights/${file.name}`).data.publicUrl;
+        console.log("FileUrl: ", fileUrl);
+        // setFileUrl(fileUrl);
+        if (error) {
+            throw error;
+        }
+        // return data;
+        const projectData: UploadData = {
+            id: Date.now().toString(),
+            goal1: "goal1",
+            goal2: "goal2",
+            goal3: "goal3",
+            phone: "+254768",
+            url: fileUrl,
+        };
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
+        console.log("projectData: ", projectData);
 
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore starter templates for Next.js.
-          </p>
-        </a>
+        const response = await axios.post("/api/supabase", projectData);
+        console.log("Response: ", response);
+        if (response.status === 200) {
+            toast.success("Form submitted successfully!");
+        } else {
+            toast.error("Error submitting form!");
+        }
+    };
 
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50 text-balance`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  );
+    const { getRootProps, getInputProps } = useDropzone({
+        accept: {
+            "application/csv": [".csv", ".json", ".xls", ".xlsx"],
+        },
+        maxFiles: 1,
+        onDrop: async (acceptedFiles) => {
+            console.log(acceptedFiles);
+            const file = acceptedFiles[0];
+            if (file.size > 5 * 1024 * 1024) {
+                toast.error("File too large. Max size is 5MB.");
+                // alert("File too large. Max size is 10MB.");
+                return;
+            }
+            try {
+                setUploading(true);
+                const data = await uploadFile(file);
+                // if (!data?.file_key || !data?.file_name) {
+                //     toast.error("Failed to upload file!");
+                //     // alert("Failed to upload file!");
+                //     return;
+                // }
+                console.log("data:", data);
+                toast.success("File uploaded successfully!");
+            } catch (error) {
+                console.log(error);
+                toast.error("Failed to upload file!");
+            } finally {
+                setUploading(false);
+            }
+        },
+    });
+    return (
+        <main className="flex max-w-[1200px] mx-auto flex-col items-center py-2 h-screen">
+            <Toaster richColors />
+            <div
+                {...getRootProps({
+                    className:
+                        "cursor-pointer p-4 border-dashed border-2 border-gray-300 rounded-xl text-center hover:border-gray-500 transition duration-300 ease-in-out",
+                })}
+            >
+                <input {...getInputProps()} className=" w-[500px] h-full" />
+                {uploading ? (
+                    <>
+                        <div className="flex justify-center items-center flex-col">
+                            <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
+                            <p className="text-gray-500 text-sm mt-2">
+                                Uploading...
+                            </p>
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        {" "}
+                        <FaFileArrowDown className=" dark:text-[#020817] text-[#020817] absolute left-[47%] text-3xl top-4" />
+                        <>
+                            <p className="text-gray-500 text-sm mt-8">
+                                Drag &apos;n&apos; drop your CSV report here, or
+                                click to select (Max size: 5MB)
+                            </p>
+                        </>
+                    </>
+                )}
+            </div>
+        </main>
+    );
 }
