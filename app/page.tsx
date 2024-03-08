@@ -10,8 +10,14 @@ import axios from "axios";
 
 export default function Home() {
     const [uploading, setUploading] = useState(false);
-    // const [fileUrl, setFileUrl] = useState<string | null>(null);
-
+    const [fileUrl, setFileUrl] = useState<string | null>(null);
+    const [formData, setFormData] = useState({
+        goal1: "",
+        goal2: "",
+        goal3: "",
+        phone: "",
+    });
+    const { goal1, goal2, goal3, phone } = formData;
     const uploadFile = async (file: File) => {
         const time: Number = new Date().valueOf();
         const imgKey: string = `insights/${time}-${file.name}`;
@@ -27,28 +33,11 @@ export default function Home() {
         const fileUrl = supabase.storage.from("picsa").getPublicUrl(imgKey)
             .data.publicUrl;
         console.log("FileUrl: ", fileUrl);
-        // setFileUrl(fileUrl);
+        setFileUrl(fileUrl);
         if (error) {
             throw error;
         }
-        // return data;
-        const projectData: UploadData = {
-            goal1: "gateregoal1",
-            goal2: "gateregoal2",
-            goal3: "gateregoal3",
-            phone: "+254768",
-            url: fileUrl,
-        };
-
-        console.log("projectData: ", projectData);
-
-        const response = await axios.post("/api/supabase", projectData);
-        console.log("Response: ", response);
-        if (response.status === 200) {
-            toast.success("Form submitted successfully!");
-        } else {
-            toast.error("Error submitting form!");
-        }
+        return data;
     };
 
     const { getRootProps, getInputProps } = useDropzone({
@@ -82,36 +71,172 @@ export default function Home() {
             }
         },
     });
+    const noData = () => {
+        toast.error("Please add a file!");
+    };
+    const onSubmit = async (e: { preventDefault: () => void }) => {
+        e.preventDefault();
+
+        const projectData: UploadData = {
+            goal1: goal1,
+            goal2: goal2,
+            goal3: goal3,
+            phone: phone,
+            url: fileUrl as string,
+        };
+
+        console.log("projectData: ", projectData);
+
+        const response = await axios.post("/api/supabase", projectData);
+        console.log("Response: ", response);
+        if (response.status === 200) {
+            toast.success("Form submitted successfully!");
+            setFormData({
+                goal1: "",
+                goal2: "",
+                goal3: "",
+                phone: "",
+            });
+        } else {
+            toast.error("Error submitting form!");
+        }
+    };
     return (
         <main className="flex max-w-[1200px] mx-auto flex-col items-center py-2 h-screen">
             <Toaster richColors />
-            <div
-                {...getRootProps({
-                    className:
-                        "cursor-pointer p-4 border-dashed border-2 border-gray-300 rounded-xl text-center hover:border-gray-500 transition duration-300 ease-in-out",
-                })}
-            >
-                <input {...getInputProps()} className=" w-[500px] h-full" />
-                {uploading ? (
-                    <>
-                        <div className="flex justify-center items-center flex-col">
-                            <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
-                            <p className="text-gray-500 text-sm mt-2">
-                                Uploading...
-                            </p>
-                        </div>
-                    </>
-                ) : (
-                    <>
-                        {" "}
-                        <FaFileArrowDown className=" dark:text-[#020817] text-[#020817] absolute left-[47%] text-3xl top-4" />
+            <div className="flex flex-col gap-4 pt-10 justify-center items-center">
+                <div className="flex flex-col gap-1">
+                    <label
+                        htmlFor="goal1"
+                        className="bg-gradient-to-r dark:from-[#00c6ff] dark:to-[#0072ff] from-[#0072ff] to-[#00c6ff]  bg-clip-text text-transparent"
+                    >
+                        Goal 1
+                    </label>
+                    <textarea
+                        name="goal1"
+                        id="goal1"
+                        value={goal1}
+                        required
+                        onChange={(e) =>
+                            setFormData({
+                                ...formData,
+                                goal1: e.target.value,
+                            })
+                        }
+                        className="p-2 border border-gray-300 rounded shadow-xl focus:outline-none focus:ring-2 focus:ring-[#287bc2] dark:focus:ring-slate-300 transition-all duration-100 ease-in-out md:w-96 w-full"
+                    />
+                </div>
+                <div className="flex flex-col gap-1">
+                    <label
+                        htmlFor="goal2"
+                        className="bg-gradient-to-r dark:from-[#00c6ff] dark:to-[#0072ff] from-[#0072ff] to-[#00c6ff]  bg-clip-text text-transparent"
+                    >
+                        Goal 2
+                    </label>
+                    <textarea
+                        name="goal2"
+                        id="goal2"
+                        value={goal2}
+                        required
+                        onChange={(e) =>
+                            setFormData({
+                                ...formData,
+                                goal2: e.target.value,
+                            })
+                        }
+                        className="p-2 border border-gray-300 rounded shadow-xl focus:outline-none focus:ring-2 focus:ring-[#287bc2] dark:focus:ring-slate-300 transition-all duration-100 ease-in-out md:w-96 w-full"
+                    />
+                </div>
+                <div className="flex flex-col gap-1">
+                    <label
+                        htmlFor="goal3"
+                        className="bg-gradient-to-r dark:from-[#00c6ff] dark:to-[#0072ff] from-[#0072ff] to-[#00c6ff]  bg-clip-text text-transparent"
+                    >
+                        Goal 3
+                    </label>
+                    <textarea
+                        name="goal3"
+                        id="goal3"
+                        value={goal3}
+                        required
+                        onChange={(e) =>
+                            setFormData({
+                                ...formData,
+                                goal3: e.target.value,
+                            })
+                        }
+                        className="p-2 border border-gray-300 rounded shadow-xl focus:outline-none focus:ring-2 focus:ring-[#287bc2] dark:focus:ring-slate-300 transition-all duration-100 ease-in-out md:w-96 w-full"
+                    />
+                </div>
+                <div className="flex flex-col gap-1">
+                    <label
+                        htmlFor="phone"
+                        className="bg-gradient-to-r dark:from-[#00c6ff] dark:to-[#0072ff] from-[#0072ff] to-[#00c6ff]  bg-clip-text text-transparent"
+                    >
+                        Phone Number *
+                    </label>
+                    <input
+                        type="text"
+                        name="phone"
+                        id="phone"
+                        value={phone}
+                        required
+                        onChange={(e) =>
+                            setFormData({
+                                ...formData,
+                                phone: e.target.value,
+                            })
+                        }
+                        className="p-2 border border-gray-300 rounded shadow-xl focus:outline-none focus:ring-2 focus:ring-[#287bc2] dark:focus:ring-slate-300 transition-all duration-100 ease-in-out md:w-96 w-full"
+                    />
+                </div>
+                <div
+                    {...getRootProps({
+                        className:
+                            "cursor-pointer p-4 border-dashed border-2 border-gray-300 rounded-xl text-center hover:border-gray-500 transition duration-300 ease-in-out relative",
+                    })}
+                >
+                    <input {...getInputProps()} className=" w-full h-full" />
+                    {uploading ? (
                         <>
-                            <p className="text-gray-500 text-sm mt-8">
-                                Drag &apos;n&apos; drop your CSV report here, or
-                                click to select (Max size: 5MB)
-                            </p>
+                            <div className="flex justify-center items-center flex-col">
+                                <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
+                                <p className="text-gray-500 text-sm mt-2">
+                                    Uploading Report...
+                                </p>
+                            </div>
                         </>
-                    </>
+                    ) : (
+                        <>
+                            {" "}
+                            <FaFileArrowDown className=" dark:text-[#020817] text-[#020817] absolute left-[47%] text-3xl top-4" />
+                            <>
+                                <p className="text-gray-500 text-sm mt-8">
+                                    Drag &apos;n&apos; drop your CSV report
+                                    here, or click to select (Max size: 5MB)
+                                </p>
+                            </>
+                        </>
+                    )}
+                </div>
+
+                {fileUrl ? (
+                    <button type="submit" onClick={onSubmit} className=" w-fit">
+                        <p className=" text-2xl bg-gradient-to-r dark:from-[#00c6ff] dark:to-[#0072ff] from-[#0072ff] to-[#00c6ff]  bg-clip-text text-transparent font-semibold">
+                            Submit
+                        </p>
+                    </button>
+                ) : (
+                    <button
+                        type="submit"
+                        onClick={noData}
+                        title="Add File"
+                        className=" w-fit"
+                    >
+                        <p className=" cursor-not-allowed text-2xl font-semibold text-gray-500">
+                            Submit
+                        </p>
+                    </button>
                 )}
             </div>
         </main>

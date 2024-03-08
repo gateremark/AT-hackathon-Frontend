@@ -28,8 +28,8 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
                 url: data.url,
             },
         ]);
-    console.log("ProjectData: ", projectData);
-    console.log("ProjectError: ", projectError);
+    // console.log("ProjectData: ", projectData);
+    // console.log("ProjectError: ", projectError);
     if (projectError) {
         return NextResponse.json({ error: projectError });
     }
