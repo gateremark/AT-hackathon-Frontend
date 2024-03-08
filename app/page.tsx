@@ -14,10 +14,10 @@ export default function Home() {
     const [fileUrl, setFileUrl] = useState<string | null>(null);
     // const [data, setData] = useState([]);
     const [formData, setFormData] = useState({
-        goal: "",
+        goal1: "",
         phone: "",
     });
-    const { goal, phone } = formData;
+    const { goal1, phone } = formData;
     const uploadFile = async (file: File) => {
         const time: Number = new Date().valueOf();
         const imgKey: string = `insights/${time}-${file.name}`;
@@ -35,8 +35,8 @@ export default function Home() {
         console.log("FileUrl: ", fileUrl);
         setFileUrl(fileUrl);
         // Parse and display the CSV file after successful upload
-        // Papa.parse(file, {
-        //     complete: function (results) {
+        // Papa.parse(fileUrl, {
+        //     complete: function (results: any) {
         //         setData(results.data);
         //     },
         // });
@@ -84,7 +84,7 @@ export default function Home() {
         e.preventDefault();
 
         const projectData: UploadData = {
-            goal: goal,
+            goal1: goal1,
             phone: phone,
             url: fileUrl as string,
         };
@@ -92,15 +92,30 @@ export default function Home() {
         console.log("projectData: ", projectData);
 
         const response = await axios.post("/api/supabase", projectData);
-        await axios.post(
-            "https://vfd2wfkp-5000.uks1.devtunnels.ms/user",
-            projectData
-        );
+        try {
+            const response2 = await fetch(
+                "https://vfd2wfkp-5000.uks1.devtunnels.ms/user",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(projectData),
+                }
+            );
+            const data = await response2.json();
+            console.log(data);
+        } catch (error) {
+            console.error("Error:", error);
+        } finally {
+            console.log("Finished processing request");
+        }
+
         console.log("Response: ", response);
         if (response.status === 200) {
             toast.success("Form submitted successfully!");
             setFormData({
-                goal: "",
+                goal1: "",
                 phone: "",
             });
         } else {
@@ -121,12 +136,12 @@ export default function Home() {
                     <textarea
                         name="goal1"
                         id="goal1"
-                        value={goal}
+                        value={goal1}
                         required
                         onChange={(e) =>
                             setFormData({
                                 ...formData,
-                                goal: e.target.value,
+                                goal1: e.target.value,
                             })
                         }
                         className="p-2 border border-gray-300 rounded shadow-xl focus:outline-none focus:ring-2 focus:ring-[#287bc2] dark:focus:ring-slate-300 transition-all duration-100 ease-in-out md:w-96 w-full"
@@ -204,6 +219,16 @@ export default function Home() {
                     </button>
                 )}
             </div>
+            {/* <div>
+                {data &&
+                    data.map((row: any[], i: number) => (
+                        <div key={i}>
+                            {row.map((item: any, j: number) => (
+                                <span key={j}>{item}</span>
+                            ))}
+                        </div>
+                    ))}
+            </div> */}
         </main>
     );
 }
