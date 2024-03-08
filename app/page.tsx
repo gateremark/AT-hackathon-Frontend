@@ -7,17 +7,17 @@ import { FaFileArrowDown } from "react-icons/fa6";
 import supabase from "@/lib/SupabaseClient";
 import { UploadData } from "@/app/api/supabase/route";
 import axios from "axios";
+// import Papa from "papaparse";
 
 export default function Home() {
     const [uploading, setUploading] = useState(false);
     const [fileUrl, setFileUrl] = useState<string | null>(null);
+    // const [data, setData] = useState([]);
     const [formData, setFormData] = useState({
-        goal1: "",
-        goal2: "",
-        goal3: "",
+        goal: "",
         phone: "",
     });
-    const { goal1, goal2, goal3, phone } = formData;
+    const { goal, phone } = formData;
     const uploadFile = async (file: File) => {
         const time: Number = new Date().valueOf();
         const imgKey: string = `insights/${time}-${file.name}`;
@@ -34,6 +34,12 @@ export default function Home() {
             .data.publicUrl;
         console.log("FileUrl: ", fileUrl);
         setFileUrl(fileUrl);
+        // Parse and display the CSV file after successful upload
+        // Papa.parse(file, {
+        //     complete: function (results) {
+        //         setData(results.data);
+        //     },
+        // });
         if (error) {
             throw error;
         }
@@ -78,9 +84,7 @@ export default function Home() {
         e.preventDefault();
 
         const projectData: UploadData = {
-            goal1: goal1,
-            goal2: goal2,
-            goal3: goal3,
+            goal: goal,
             phone: phone,
             url: fileUrl as string,
         };
@@ -88,13 +92,15 @@ export default function Home() {
         console.log("projectData: ", projectData);
 
         const response = await axios.post("/api/supabase", projectData);
+        await axios.post(
+            "https://vfd2wfkp-5000.uks1.devtunnels.ms/user",
+            projectData
+        );
         console.log("Response: ", response);
         if (response.status === 200) {
             toast.success("Form submitted successfully!");
             setFormData({
-                goal1: "",
-                goal2: "",
-                goal3: "",
+                goal: "",
                 phone: "",
             });
         } else {
@@ -110,64 +116,23 @@ export default function Home() {
                         htmlFor="goal1"
                         className="bg-gradient-to-r dark:from-[#00c6ff] dark:to-[#0072ff] from-[#0072ff] to-[#00c6ff]  bg-clip-text text-transparent"
                     >
-                        Goal 1
+                        Goal
                     </label>
                     <textarea
                         name="goal1"
                         id="goal1"
-                        value={goal1}
+                        value={goal}
                         required
                         onChange={(e) =>
                             setFormData({
                                 ...formData,
-                                goal1: e.target.value,
+                                goal: e.target.value,
                             })
                         }
                         className="p-2 border border-gray-300 rounded shadow-xl focus:outline-none focus:ring-2 focus:ring-[#287bc2] dark:focus:ring-slate-300 transition-all duration-100 ease-in-out md:w-96 w-full"
                     />
                 </div>
-                <div className="flex flex-col gap-1">
-                    <label
-                        htmlFor="goal2"
-                        className="bg-gradient-to-r dark:from-[#00c6ff] dark:to-[#0072ff] from-[#0072ff] to-[#00c6ff]  bg-clip-text text-transparent"
-                    >
-                        Goal 2
-                    </label>
-                    <textarea
-                        name="goal2"
-                        id="goal2"
-                        value={goal2}
-                        required
-                        onChange={(e) =>
-                            setFormData({
-                                ...formData,
-                                goal2: e.target.value,
-                            })
-                        }
-                        className="p-2 border border-gray-300 rounded shadow-xl focus:outline-none focus:ring-2 focus:ring-[#287bc2] dark:focus:ring-slate-300 transition-all duration-100 ease-in-out md:w-96 w-full"
-                    />
-                </div>
-                <div className="flex flex-col gap-1">
-                    <label
-                        htmlFor="goal3"
-                        className="bg-gradient-to-r dark:from-[#00c6ff] dark:to-[#0072ff] from-[#0072ff] to-[#00c6ff]  bg-clip-text text-transparent"
-                    >
-                        Goal 3
-                    </label>
-                    <textarea
-                        name="goal3"
-                        id="goal3"
-                        value={goal3}
-                        required
-                        onChange={(e) =>
-                            setFormData({
-                                ...formData,
-                                goal3: e.target.value,
-                            })
-                        }
-                        className="p-2 border border-gray-300 rounded shadow-xl focus:outline-none focus:ring-2 focus:ring-[#287bc2] dark:focus:ring-slate-300 transition-all duration-100 ease-in-out md:w-96 w-full"
-                    />
-                </div>
+
                 <div className="flex flex-col gap-1">
                     <label
                         htmlFor="phone"

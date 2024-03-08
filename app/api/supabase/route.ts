@@ -4,9 +4,8 @@ import { v4 as uuidv4 } from "uuid";
 
 export type UploadData = {
     id?: string;
-    goal1?: string;
-    goal2?: string;
-    goal3?: string;
+    goal?: string;
+
     phone: string;
     url: string;
 };
@@ -21,9 +20,7 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
         .insert([
             {
                 id: id,
-                goal1: data.goal1,
-                goal2: data.goal2,
-                goal3: data.goal3,
+                goal: data.goal,
                 phone: data.phone,
                 url: data.url,
             },
