@@ -14,10 +14,10 @@ export type UploadData = {
 export const POST = async (req: NextRequest, res: NextResponse) => {
     const data: UploadData = await req.json();
     const id = uuidv4();
-    const projectUrl = `${id}`;
+    // const projectUrl = `${id}`;
 
     const { data: projectData, error: projectError } = await supabase
-        .from("project")
+        .from("Insights")
         .insert([
             {
                 id: id,

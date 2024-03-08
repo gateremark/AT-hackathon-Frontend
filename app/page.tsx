@@ -13,8 +13,8 @@ export default function Home() {
     // const [fileUrl, setFileUrl] = useState<string | null>(null);
 
     const uploadFile = async (file: File) => {
-      const time: Number = new Date().valueOf();
-      const imgKey: string = `insights/${file.name}-${time}`;
+        const time: Number = new Date().valueOf();
+        const imgKey: string = `insights/${time}-${file.name}`;
         const { data, error } = await supabase.storage
             .from("picsa")
             .upload(imgKey, file, {
@@ -24,9 +24,8 @@ export default function Home() {
         console.log("Data: ", data);
         console.log("Error: ", error);
 
-        const fileUrl = supabase.storage
-            .from("picsa")
-            .getPublicUrl(`insights/${file.name}`).data.publicUrl;
+        const fileUrl = supabase.storage.from("picsa").getPublicUrl(imgKey)
+            .data.publicUrl;
         console.log("FileUrl: ", fileUrl);
         // setFileUrl(fileUrl);
         if (error) {
@@ -34,10 +33,9 @@ export default function Home() {
         }
         // return data;
         const projectData: UploadData = {
-            id: Date.now().toString(),
-            goal1: "goal1",
-            goal2: "goal2",
-            goal3: "goal3",
+            goal1: "gateregoal1",
+            goal2: "gateregoal2",
+            goal3: "gateregoal3",
             phone: "+254768",
             url: fileUrl,
         };
@@ -59,13 +57,13 @@ export default function Home() {
         },
         maxFiles: 1,
         onDrop: async (acceptedFiles) => {
-            console.log(acceptedFiles);
+            // console.log(acceptedFiles);
             const file = acceptedFiles[0];
-            if (file.size > 5 * 1024 * 1024) {
-                toast.error("File too large. Max size is 5MB.");
-                // alert("File too large. Max size is 10MB.");
-                return;
-            }
+            // if (file.size > 5 * 1024 * 1024) {
+            //     toast.error("File too large. Max size is 5MB.");
+            //     // alert("File too large. Max size is 10MB.");
+            //     return;
+            // }
             try {
                 setUploading(true);
                 const data = await uploadFile(file);
@@ -74,7 +72,7 @@ export default function Home() {
                 //     // alert("Failed to upload file!");
                 //     return;
                 // }
-                console.log("data:", data);
+                // console.log("data:", data);
                 toast.success("File uploaded successfully!");
             } catch (error) {
                 console.log(error);
