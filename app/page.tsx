@@ -137,7 +137,7 @@ export default function Home() {
                         htmlFor="phone"
                         className="bg-gradient-to-r dark:from-[#00c6ff] dark:to-[#0072ff] from-[#0072ff] to-[#00c6ff]  bg-clip-text text-transparent"
                     >
-                        Phone Number *
+                        Phone Number <span className="text-xs italic">(eg. 254724)</span> *
                     </label>
                     <input
                         type="text"
