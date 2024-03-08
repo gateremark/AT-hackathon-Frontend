@@ -7,12 +7,12 @@ import { FaFileArrowDown } from "react-icons/fa6";
 import supabase from "@/lib/SupabaseClient";
 import { UploadData } from "@/app/api/supabase/route";
 import axios from "axios";
-// import Papa from "papaparse";
+
 
 export default function Home() {
     const [uploading, setUploading] = useState(false);
     const [fileUrl, setFileUrl] = useState<string | null>(null);
-    // const [data, setData] = useState([]);
+   
     const [formData, setFormData] = useState({
         goal1: "",
         phone: "",
@@ -34,12 +34,7 @@ export default function Home() {
             .data.publicUrl;
         console.log("FileUrl: ", fileUrl);
         setFileUrl(fileUrl);
-        // Parse and display the CSV file after successful upload
-        // Papa.parse(fileUrl, {
-        //     complete: function (results: any) {
-        //         setData(results.data);
-        //     },
-        // });
+        
         if (error) {
             throw error;
         }
@@ -52,22 +47,13 @@ export default function Home() {
         },
         maxFiles: 1,
         onDrop: async (acceptedFiles) => {
-            // console.log(acceptedFiles);
+            
             const file = acceptedFiles[0];
-            // if (file.size > 5 * 1024 * 1024) {
-            //     toast.error("File too large. Max size is 5MB.");
-            //     // alert("File too large. Max size is 10MB.");
-            //     return;
-            // }
+            
             try {
                 setUploading(true);
                 const data = await uploadFile(file);
-                // if (!data?.file_key || !data?.file_name) {
-                //     toast.error("Failed to upload file!");
-                //     // alert("Failed to upload file!");
-                //     return;
-                // }
-                // console.log("data:", data);
+                
                 toast.success("File uploaded successfully!");
             } catch (error) {
                 console.log(error);
@@ -93,16 +79,13 @@ export default function Home() {
 
         const response = await axios.post("/api/supabase", projectData);
         try {
-            const response2 = await fetch(
-                "https://vfd2wfkp-5000.uks1.devtunnels.ms/user",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(projectData),
-                }
-            );
+            const response2 = await fetch("/api/user", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(projectData),
+            });
             const data = await response2.json();
             console.log(data);
         } catch (error) {
